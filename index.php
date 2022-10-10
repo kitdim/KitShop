@@ -6,3 +6,10 @@ session_start();
 
 require_once 'config.php';
 require_once 'core/base/settings/internal_settings.php';
+
+try {
+    (new A());
+}
+catch (RouteException $e){
+    exit($e->getMessage());
+}
