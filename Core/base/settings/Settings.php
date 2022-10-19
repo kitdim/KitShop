@@ -35,9 +35,15 @@ class Settings
         ]
     ];
 
+    private $teplateArr = [
+        'text' => ['name','phone','adress'],
+        'textarea' => ['content', 'keywords']
+    ];
+
     private function __construct(){
 
     }
+
     private function __clone(){
 
     }
@@ -52,5 +58,42 @@ class Settings
         }
 
         return self::$_instance = new self;
+    }
+    public function clueProperties($class){
+        $baseProperties = [];
+
+        foreach ($this as $name => $item){
+            $property = $class::get($name);
+
+            if (is_array($property) && is_array($item)){
+                $baseProperties = $this->arrayMergeRecursive($this->$name, $property);
+                continue;
+            }
+
+            if (!$property) $baseProperties[$name] = $this->$name;
+        }
+
+        return $baseProperties;
+    }
+
+    public function arrayMergeRecursive(){
+        $arrays = func_get_args();
+
+        $base = array_shift($arrays);
+
+        foreach ($arrays as $array){
+            foreach ($arrays as $key => $value){
+                if (is_array($value) && is_array($base($key))){
+                    $base[$key] = $this->arrayMergeRecursive($base[$key], $value);
+                }else{
+                    if (is_int($key)){
+                        if (!in_array($value, $base)) array_push($base,$value);
+                        continue;
+                    }
+                    $base[$key] = $value;
+                }
+            }
+        }
+        return $base;
     }
 }
